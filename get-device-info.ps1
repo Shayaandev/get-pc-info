@@ -1,5 +1,6 @@
 # Get user name
 $username = Read-Host "Enter the name of the user"
+$location = Read-Host "Enter the location of this system"
 
 # Get Hostname
 $hostname = $env:COMPUTERNAME
@@ -33,6 +34,7 @@ $allAdapters = ($networkDetails | ForEach-Object {"$($_.Description)-$($_.MACAdd
 # Output collected information
 $systemInfo = [PSCustomObject]@{
     "User"            = $username
+    "Location"        = $location  
     "Hostname"        = $hostname
     "Model"           = $computerSystem.Model
     "Processor"       = $processor.Name
