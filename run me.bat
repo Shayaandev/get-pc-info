@@ -8,5 +8,6 @@ popd
 
 echo.
 echo Script complete. Closing in 3 seconds...
+timeout /t 3
 
-pause
+exit
