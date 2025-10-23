@@ -11,6 +11,7 @@ $bios = Get-CimInstance -ClassName Win32_BIOS
 $processor = Get-CimInstance -ClassName Win32_Processor
 $os = Get-CimInstance -ClassName Win32_OperatingSystem
 $memoryModules = Get-CimInstance -ClassName Win32_PhysicalMemory
+$physicalDisks = Get-CimInstance Win32_DiskDrive
 $diskCapacity = Get-CimInstance Win32_DiskDrive | ForEach-Object { "{0} GB" -f [math]::Round($_.Size / 1GB, 2) }
 $networkDetails = Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled = True" | Select-Object Description, MACAddress
 $timestamp = Get-Date -Format "dd-MM-yyyy_HHmmss"
@@ -22,14 +23,13 @@ $totalRAMGB = [math]::Round(($computerSystem.TotalPhysicalMemory / 1GB), 2)
 # Get RAM Speeds (there may be more than one module with different speeds)
 $ramSpeeds = ($memoryModules | Select-Object -ExpandProperty Speed | Sort-Object -Unique)
 
-# Join multiple speeds into one string, if needed
-$ramSpeedString = ($ramSpeeds -join ", ")
-
 # Counting Disks
-$diskCount = $disks.count + 1
+$diskCount = $physicalDisks.count + 1
 
-# Join Networking info into one string
+# Joining strings
+$ramSpeedString = ($ramSpeeds -join ", ")
 $allAdapters = ($networkDetails | ForEach-Object {"$($_.Description)-$($_.MACAddress)"})-join ", "
+$diskCapacity = ($diskCapacity -join ", ")
 
 # Output collected information
 $systemInfo = [PSCustomObject]@{
