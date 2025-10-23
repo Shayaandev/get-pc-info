@@ -24,8 +24,11 @@ $ramSpeeds = ($memoryModules | Select-Object -ExpandProperty Speed | Sort-Object
 # Join multiple speeds into one string, if needed
 $ramSpeedString = ($ramSpeeds -join ", ")
 
+# Counting Disks
 $diskCount = $disks.count + 1
 
+# Join Networking info into one string
+$allAdapters = ($networkDetails | ForEach-Object {"$($_.Description)-$($_.MACAddress)"})-join ", "
 
 # Output collected information
 $systemInfo = [PSCustomObject]@{
@@ -40,19 +43,9 @@ $systemInfo = [PSCustomObject]@{
     "Disk Sizes"      = $diskCapacity
     "OperatingSystem" = $os.Caption
     "SerialNumber"    = $bios.SerialNumber
+    "Networking Info" = $allAdapters
     "Date and time"   = $timestamp
-    
 }
-
-$networkInfo = [PSCustomObject]@{
-    "Network Info" = $networkDetails
-}
-
-# Define output filename (e.g., NetworkInfo-MYPC.txt)
-$outputFile = ".\NetworkInfo-$hostname-$timestamp.txt"
-
-# Convert the info to formatted text and save
-$networkInfo | Format-List | Out-File -FilePath $outputFile -Encoding UTF8
 
 $outputFile = ".\SystemInfoLog.csv"
 
