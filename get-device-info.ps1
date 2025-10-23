@@ -1,3 +1,6 @@
+# Get user name
+$username = Read-Host "Enter the name of the user"
+
 # Get Hostname
 $hostname = $env:COMPUTERNAME
 
@@ -7,7 +10,7 @@ $bios = Get-CimInstance -ClassName Win32_BIOS
 $processor = Get-CimInstance -ClassName Win32_Processor
 $os = Get-CimInstance -ClassName Win32_OperatingSystem
 $memoryModules = Get-CimInstance -ClassName Win32_PhysicalMemory
-$diskCapacity = Get-CimInstance Win32_DiskDrive | ForEach-Object {"{0} GB" -f [math]::Round($_.Size / 1GB, 2)}
+$diskCapacity = Get-CimInstance Win32_DiskDrive | ForEach-Object { "{0} GB" -f [math]::Round($_.Size / 1GB, 2) }
 $networkDetails = Get-CimInstance Win32_NetworkAdapterConfiguration -Filter "IPEnabled = True" | Select-Object Description, MACAddress
 $timestamp = Get-Date -Format "dd-MM-yyyy_HHmmss"
 
@@ -23,19 +26,21 @@ $ramSpeedString = ($ramSpeeds -join ", ")
 
 $diskCount = $disks.count + 1
 
+
 # Output collected information
 $systemInfo = [PSCustomObject]@{
-    "Hostname" = $hostname
-    "Model" = $computerSystem.Model
-    "Processor" = $processor.Name
-    "ProcessorSpeed" = "$($processor.MaxClockSpeed) MHz"
-    "TotalRAM" = "$totalRAMGB GB"
-    "RAMspeed" = "$ramSpeedString MHz"
-    "No of Disks" = $diskCount
-    "Disk Sizes" = $diskCapacity
+    "User"            = $username
+    "Hostname"        = $hostname
+    "Model"           = $computerSystem.Model
+    "Processor"       = $processor.Name
+    "ProcessorSpeed"  = "$($processor.MaxClockSpeed) MHz"
+    "TotalRAM"        = "$totalRAMGB GB"
+    "RAMspeed"        = "$ramSpeedString MHz"
+    "No of Disks"     = $diskCount
+    "Disk Sizes"      = $diskCapacity
     "OperatingSystem" = $os.Caption
-    "SerialNumber" = $bios.SerialNumber
-    "Date and time" = $timestamp
+    "SerialNumber"    = $bios.SerialNumber
+    "Date and time"   = $timestamp
     
 }
 
@@ -49,14 +54,13 @@ $outputFile = ".\NetworkInfo-$hostname-$timestamp.txt"
 # Convert the info to formatted text and save
 $networkInfo | Format-List | Out-File -FilePath $outputFile -Encoding UTF8
 
-#Write-Host "`nSystem information saved to: $outputFile" -ForegroundColor Green
-
 $outputFile = ".\SystemInfoLog.csv"
 
-# If file doesn’t exist, create it; otherwise append new entry
+# If file doesnt exist, create it; otherwise append new entry
 if (Test-Path $outputFile) {
     $systemInfo | Export-Csv -Path $outputFile -NoTypeInformation -Append
-} else {
+}
+else {
     $systemInfo | Export-Csv -Path $outputFile -NoTypeInformation
 }
 
